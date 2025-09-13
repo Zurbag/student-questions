@@ -1,17 +1,20 @@
 package ru.zurbag.question.dao;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 import ru.zurbag.question.domain.Question;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class QuestionDaoCsv implements QuestionDao {
 
     private final String csvResourcePath;
 
-    public QuestionDaoCsv(String csvResourcePath) {
+    public QuestionDaoCsv(@Value("${csv.file.path}") String csvResourcePath) {
         this.csvResourcePath = csvResourcePath;
     }
 
@@ -23,8 +26,8 @@ public class QuestionDaoCsv implements QuestionDao {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(";");
-                if (parts.length >= 2) {
-                    questions.add(new Question(parts[0].trim(), parts[1].trim()));
+                if (parts.length >= 3) {
+                    questions.add(new Question(parts[0].trim(), parts[1].trim(), parts[2].trim()));
                 }
             }
         } catch (Exception e) {
