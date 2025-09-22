@@ -1,4 +1,7 @@
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import ru.zurbag.question.dao.QuestionDaoCsv;
 import ru.zurbag.question.domain.Question;
 
@@ -8,11 +11,31 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringJUnitConfig(TestConfig.class)
 class QuestionDaoCsvTest {
+
+    @Value("${csv.file.path.test}")
+    private String csvFilePathTest;
+
+    @Value("${csv.file.path.main}")
+    private String csvFilePathMain;
+
+    @Test
+    void testCsvFileExistsInTestResources() {
+        ClassPathResource resource = new ClassPathResource(csvFilePathTest);
+        assertTrue(resource.exists(), "В тестовых ресурсах ожидается файл: "+csvFilePathTest);
+    }
+
+    @Test
+    void testCsvFileExistsInMainResources() {
+        ClassPathResource resource = new ClassPathResource(csvFilePathMain);
+        assertTrue(resource.exists(), "В основных ресурсах ожидается файл: " + csvFilePathMain);
+    }
+
 
     @Test
     void testCsvFileReading() {
-        QuestionDaoCsv dao = new QuestionDaoCsv("questions.csv");
+        QuestionDaoCsv dao = new QuestionDaoCsv(csvFilePathMain);
 
         List<Question> questions = dao.findAll();
 
@@ -31,7 +54,7 @@ class QuestionDaoCsvTest {
 
     @Test
     void testCsvCategoryFileReading() {
-        QuestionDaoCsv dao = new QuestionDaoCsv("questions.csv");
+        QuestionDaoCsv dao = new QuestionDaoCsv(csvFilePathMain);
         List<Question> questions = dao.findAll();
         Set<String> categories = questions.stream()
                 .map(Question::getCategory)
